@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,6 +42,7 @@ public class WriteActivity extends AppCompatActivity {
         if(activityName == NoteAdapter.NAME){
             Note note = (Note)intent.getSerializableExtra("Content");
             contentText.setText(note.getContent());
+            contentText.setSelection(note.getContent().length());
             noteID = note.getId();
         }
 
@@ -64,12 +66,24 @@ public class WriteActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case android.R.id.home:
+                Intent intent = new Intent(WriteActivity.this,MainActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
     public void updateData(){
         if(!(contentText.getText().toString().equals(""))){
             Note note = new Note();
             note.setDate(new Date());
             note.setContent(contentText.getText().toString());
-            contentText.setSelection(contentText.getText().toString().length());
             note.update(noteID);
         }
 

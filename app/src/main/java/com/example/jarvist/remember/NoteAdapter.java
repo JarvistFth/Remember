@@ -11,11 +11,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -27,13 +30,18 @@ public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder> {
     private List<Note> mNoteList;
     public static final int NAME = 1;
     private Context mContext;
+    //multiple choice
+    private boolean MUL_tag = false;
+    //checkbox situation map
+    private HashMap<Integer,Boolean> ischecked;
+
+
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         CardView cardView;
         TextView contentView;
         TextView dateView;
         CheckBox checkBox;
-        TextView fistlineView;
 
         public ViewHolder(View v){
             super(v);
@@ -41,13 +49,15 @@ public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder> {
             contentView = (TextView)v.findViewById(R.id.content);
             dateView = (TextView)v.findViewById(R.id.date);
 
-
         }
     }
 
     public NoteAdapter (List<Note> noteList){
         mNoteList = noteList;
     }
+
+
+
 
     @Override
     public ViewHolder onCreateViewHolder (final ViewGroup parent, int viewType){
@@ -69,17 +79,13 @@ public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder> {
 
             }
         });
-
-
-
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder,int positon){
+    public void onBindViewHolder(final ViewHolder holder, final int positon){
         Note note = mNoteList.get(positon);
         String values = note.getContent();
-        Log.d("BindViewHolder",values);
         holder.contentView.setText(values);
         holder.dateView.setText(new SimpleDateFormat("yyyy/MM/dd    HH:mm:ss").format(note.getDate()));
 

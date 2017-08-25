@@ -13,7 +13,15 @@ public class Note extends DataSupport implements Serializable {
     private int id;
     private String content;
     private Date date;
+    private boolean checked;
 
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
 
     public int getId() {
         return id;

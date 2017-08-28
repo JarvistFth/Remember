@@ -32,9 +32,9 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:id="@+id/menu2"
-                    android:src="@drawable/check"
+                    android:src="@drawable/check1"
                     android:background="@null"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginEnd="5dp"
                     android:layout_gravity="right"/>
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.AppBarLayout>

@@ -9,10 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import java.util.Date;
 
@@ -20,7 +22,7 @@ public class WriteActivity extends AppCompatActivity {
 
     private ActionBar actionBar;
     private int noteID;
-    private int activityName;
+    private int status;
     private EditText contentText;
     private ImageButton menuView;
 
@@ -38,24 +40,34 @@ public class WriteActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
         Intent intent = getIntent();
-        activityName = intent.getIntExtra("ActivityName",0);
-        if(activityName == NoteAdapter.NAME){
+        status = intent.getIntExtra("Status",0);
+        if(status == MainActivity.READ){
             Note note = (Note)intent.getSerializableExtra("Content");
             contentText.setText(note.getContent());
             contentText.setSelection(note.getContent().length());
             noteID = note.getId();
         }
 
+        menuView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN)
+                    menuView.setBackgroundColor(getResources().getColor(R.color.colorbg1));
+                else if(event.getAction() == MotionEvent.ACTION_UP)
+                    menuView.setBackgroundColor(getResources().getColor(R.color.colorbg2));
+                return false;
+            }
+        });
 
         menuView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(activityName == MainActivity.NAME){
+                if(status == MainActivity.WRITE){
                     Intent intent1 = new Intent(WriteActivity.this,MainActivity.class);
                     startActivity(intent1);
                     saveData();
                 }
-                else if(activityName == NoteAdapter.NAME){
+                else if(status == MainActivity.READ){
                     Intent intent1 = new Intent(WriteActivity.this,MainActivity.class);
                     startActivity(intent1);
                     updateData();
@@ -78,6 +90,7 @@ public class WriteActivity extends AppCompatActivity {
         }
         return true;
     }
+
 
     public void updateData(){
         if(!(contentText.getText().toString().equals(""))){

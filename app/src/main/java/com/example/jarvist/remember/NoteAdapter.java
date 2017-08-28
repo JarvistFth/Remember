@@ -23,29 +23,33 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jarvist on 2017/8/24.
  */
 
-public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder>  {
+public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder>
+            implements View.OnClickListener,View.OnLongClickListener{
 
     private List<Note> mNoteList;
 
-    public static final int NAME = 1;
     private Context mContext;
+
+    private RecyclerViewOnItemClickListener onItemClickListener;
     //multiple choice
-    private boolean MUL_tag = false;
+    public boolean MUL_tag = false;
     //checkbox situation map
-    private HashMap<Integer,Boolean> ischecked;
-
-    public static final int MUL_TAG = 1;
+    private HashMap<Integer,Boolean> ischecked = new HashMap<Integer, Boolean>();
 
 
+    public NoteAdapter (List<Note> noteList){
+        mNoteList = noteList;
+        initMaps();
+    }
 
     public void initMaps(){
         for(int i = 0; i <mNoteList.size(); i++){
-            ischecked = new HashMap<Integer, Boolean>();
             ischecked.put(i,false);
         }
     }
@@ -66,14 +70,6 @@ public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder>  
         }
     }
 
-    public NoteAdapter (List<Note> noteList){
-        mNoteList = noteList;
-        initMaps();
-    }
-
-
-
-
     @Override
     public ViewHolder onCreateViewHolder (final ViewGroup parent, int viewType){
         if(mContext == null){
@@ -82,51 +78,15 @@ public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder>  
         final View view = LayoutInflater.from(mContext).inflate(R.layout.note_item,parent,false);
         final ViewHolder viewHolder = new ViewHolder(view);
 
-        viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = viewHolder.getAdapterPosition();
-                Note note = mNoteList.get(position);
-                Intent intent = new Intent(mContext,WriteActivity.class);
-                intent.putExtra("ActivityName",NAME);
-                intent.putExtra("Content",note);
-                mContext.startActivity(intent);
+        viewHolder.cardView.setOnClickListener(this);
+        viewHolder.cardView.setOnLongClickListener(this);
 
-            }
-        });
-
-        viewHolder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                int position = viewHolder.getAdapterPosition();
-                ischecked.put(position,true);
-                viewHolder.checkBox.setChecked(ischecked.get(position));
-                /*Intent intent = new Intent(mContext,MainActivity.class);
-                intent.putExtra("MUL_TAG",MUL_TAG);
-                mContext.startActivity(intent);*/
-                MUL_tag = true;
-                NoteAdapter.super.notifyDataSetChanged();
-                return true;
-            }
-        });
-
-
-
-        viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int position = viewHolder.getAdapterPosition();
-                Note note = mNoteList.get(position);
-                note.setChecked(isChecked);
-                note.update(note.getId());
-            }
-        });
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int positon){
-        Note note = mNoteList.get(positon);
+    public void onBindViewHolder(final ViewHolder holder, final int position){
+        Note note = mNoteList.get(position);
         String values = note.getContent();
         holder.contentView.setText(values);
         holder.dateView.setText(new SimpleDateFormat("yyyy/MM/dd    HH:mm:ss").format(note.getDate()));
@@ -136,6 +96,16 @@ public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder>  
         else {
             holder.checkBox.setVisibility(View.INVISIBLE);
         }
+        holder.cardView.setTag(position);
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                ischecked.put(position,isChecked);
+            }
+        });
+        if(ischecked.get(position) == null)
+            ischecked.put(position,false);
+        holder.checkBox.setChecked(ischecked.get(position));
     }
 
     @Override
@@ -143,6 +113,44 @@ public class NoteAdapter extends RecyclerView.Adapter <NoteAdapter.ViewHolder>  
         return mNoteList.size();
     }
 
+    @Override
+    public void onClick(View v){
+        if(onItemClickListener != null)
+        {
+            onItemClickListener.onItemClickListener(v,(Integer)v.getTag());
+        }
+    }
 
+    @Override
+    public boolean onLongClick(View v){
+        initMaps();
+        return onItemClickListener != null && onItemClickListener.onLongClickListener(v,(Integer)v.getTag());
+        }
+
+    public void setRecycleViewOnItemClickListener(RecyclerViewOnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public void setCheckBox(){
+        MUL_tag = !MUL_tag;
+    }
+
+    public void setSelection(int position){
+        if(ischecked.get(position))
+            ischecked.put(position,false);
+        else
+            ischecked.put(position,true);
+        notifyItemChanged(position);
+    }
+
+    public HashMap<Integer,Boolean> getMap(){
+        return ischecked;
+    }
+
+    public interface RecyclerViewOnItemClickListener
+    {
+        void onItemClickListener(View view,int position);
+        boolean onLongClickListener(View view, int position);
+    }
 
 }

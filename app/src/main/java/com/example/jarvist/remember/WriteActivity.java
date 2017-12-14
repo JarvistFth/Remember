@@ -16,15 +16,19 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVUser;
+
 import java.util.Date;
 
 public class WriteActivity extends AppCompatActivity {
 
     private ActionBar actionBar;
-    private int noteID;
+    private String noteID;
     private int status;
     private EditText contentText;
     private ImageButton menuView;
+    private AVUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +45,18 @@ public class WriteActivity extends AppCompatActivity {
         }
         Intent intent = getIntent();
         status = intent.getIntExtra("Status",0);
+        Bundle bundle = intent.getExtras();
         if(status == MainActivity.READ){
-            Note note = (Note)intent.getSerializableExtra("Content");
-            contentText.setText(note.getContent());
-            contentText.setSelection(note.getContent().length());
-            noteID = note.getId();
-        }
+            //读操作
 
+            //显示内容和游标放到内容末端
+            if(bundle.getString("Content") != null)
+            contentText.setText(bundle.getString("Content"));
+            contentText.setSelection(bundle.getString("Content").length());
+            //获取id
+            noteID = bundle.getString("objectId");
+        }
+        //按钮按下背景变化
         menuView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -62,15 +71,19 @@ public class WriteActivity extends AppCompatActivity {
         menuView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //新增便签
                 if(status == MainActivity.WRITE){
+                    saveData();
                     Intent intent1 = new Intent(WriteActivity.this,MainActivity.class);
                     startActivity(intent1);
-                    saveData();
+
                 }
                 else if(status == MainActivity.READ){
+                    //读取便签后更新数据
+                    updateData();
                     Intent intent1 = new Intent(WriteActivity.this,MainActivity.class);
                     startActivity(intent1);
-                    updateData();
+
 
                 }
                 finish();
@@ -78,6 +91,7 @@ public class WriteActivity extends AppCompatActivity {
         });
     }
 
+    //左上角home键
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
@@ -94,20 +108,22 @@ public class WriteActivity extends AppCompatActivity {
 
     public void updateData(){
         if(!(contentText.getText().toString().equals(""))){
-            Note note = new Note();
-            note.setDate(new Date());
-            note.setContent(contentText.getText().toString());
-            note.update(noteID);
+            AVObject note = AVObject.createWithoutData("Note",noteID);
+            currentUser = AVUser.getCurrentUser();
+            note.put("Content",contentText.getText().toString());
+            note.put("UserName",currentUser.getUsername());
+            note.saveInBackground();
         }
 
     }
 
     public void saveData(){
         if(!(contentText.getText().toString().equals("")) ){
-            Note note = new Note();
-            note.setDate(new Date());
-            note.setContent(contentText.getText().toString());
-            note.save();
+            AVObject note = new AVObject("Note");
+            currentUser = AVUser.getCurrentUser();
+            note.put("Content",contentText.getText().toString());
+            note.put("UserName",currentUser.getUsername());
+            note.saveInBackground();
         }
 
     }

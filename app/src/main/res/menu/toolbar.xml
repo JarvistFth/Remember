@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/backup"
+        android:icon="@drawable/set"
+        android:title="版本号"
+        app:showAsAction="never">
+    </item>
 
+    <item
+        android:id="@+id/more"
+        android:icon="@drawable/more"
+        android:title="更多"
+        app:showAsAction="never">
+    </item>
 
 </menu>

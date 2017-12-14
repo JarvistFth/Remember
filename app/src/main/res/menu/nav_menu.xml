@@ -7,15 +7,9 @@
             android:icon="@drawable/account"
             android:title="个人中心"/>
         <item
-            android:id="@+id/nav_locked"
-            android:icon="@drawable/chatting"
-            android:title="上锁"/>
-        <item
             android:id="@+id/nav_notification"
             android:icon="@drawable/notification"
             android:title="通知"/>
-
-
     </group>
     <group
         android:checkableBehavior="none"
@@ -26,12 +20,17 @@
         android:title="夜间模式"/>
     <item android:id="@+id/nav_setting"
         android:title="设置"/>
+    </group>
+    <group>
     <item android:id="@+id/nav_suggestion"
         android:title="意见反馈"/>
     <item android:id="@+id/nav_about"
         android:title="关于"/>
+     </group>
     <item android:id="@+id/nav_logOut"
-            android:title="退出登录"/>
-    </group>
+            android:title="切换账户"/>
+    <item android:id="@+id/finish"
+        android:title="退出"/>
+
 
 </menu>
